@@ -1,76 +1,112 @@
+
 var express = require('express');
 var app = express();
 
-//var Gpio = require('onoff').Gpio,
-  //upButton = new Gpio(27, 'out'),
-  //downButton = new Gpio(15, 'out'),
-  //stopButton = new Gpio(14,'out')
+var sleep = require('sleep');
 
-var gpio = require('pi-gpio');
+//var pigpio = require("pi-gpio");
 
-var standardTimeout = 500;
+var Gpio = require('onoff').Gpio,
+  upButton = new Gpio(18, 'out'),
+  downButton = new Gpio(24, 'in'),
+  stopButton = new Gpio(14, 'out'),
+  selectButton = new Gpio(23, 'out')
 
-app.get('/', function(req, res) {
+  stopButton.writeSync(0);
+  upButton.writeSync(0);
+//  downButton.writeSync(0);
+  selectButton.writeSync(0);
+
+var standardButtonPress = 60000; //microseconds
+
+app.post('/', function(req, res) {
   res.type('text/plain');
   res.send('SomfyProxy');
 });
 
-app.get('/up', function(req, res) {
+app.post('/up', function(req, res) {
   res.type('text/plain');
   res.send('going up');
-//setTimeout(function (){  upButton.writeSync(1);
-//},500);
-//upButton.writeSync(0);                  
+
+upButton.writeSync(1);
+sleep.usleep(standardButtonPress);
+upButton.writeSync(0);
+                  
 });
 
-app.get('/down', function(req, res) {
+app.post('/down', function(req, res) {
   res.type('text/plain');
   res.send('going down');
-//setTimeout(function() {
-  //  downButton.writeSync(0);
-//}, 100);
 
-//setTimeout(function() {
-  //  downButton.writeSync(1);
-//}, standardTimeout);
+console.log('setting down to 1')
+downButton.setDirection('out');
+downButton.writeSync(1);
+sleep.usleep(60000);
+downButton.writeSync(0);
+downButton.setDirection('in');
 
-//setTimeout(function() {
-//    downButton.writeSync(0);
-//}, 100);
+/*downButton.write(1,function(err){
+	console.log(err);
+	sleep.usleep(200000);
+	downButton.write(0,function(err){
+	console.log(err);
+	});
+});*/
+//sleep.sleep(5);
+//console.log('setting down to 0');
+//downButton.writeSync(0);
 
+
+//pigpio.open(8, "output", function(err) {     // Open pin 16 for output
+//	console.log(err);
+//         pigpio.write(8, 1, function() {        
+//setTimeout(function(){pigpio.write(8, 0, function() { pigpio.close(8);},1000);
+//  });
+//});
+//});
+   
 });
 
-app.get('/stop', function(req, res) {
+app.post('/stop', function(req, res) {
   res.type('text/plain');
   res.send('stopping');
 
-//setTimeout(function() {
-//    stopButton.writeSync(0);
-//}, 100);
-
-//setTimeout(function() {
-//    stopButton.writeSync(1);
-//}, standardTimeout);
-
-//setTimeout(function() {
-//    stopButton.writeSync(0);
-//}, 100);
-
-setTimeout(function(){ 
- gpio.open(7, "output", function(err) { 
-    gpio.write(7, 1, function() {         
-        gpio.close(7);              
-    });
-})}
-,500);
+stopButton.writeSync(1);
+sleep.usleep(standardButtonPress);
+stopButton.writeSync(0);
 
 });
 
-app.listen(4734);
+app.post('/select', function(req, res) {
+  res.type('text/plain');
+  res.send('changed channel');
+
+selectChannel();
+});
+
+
+function selectChannel()
+{
+selectButton.writeSync(1);
+sleep.sleep(2);
+selectButton.writeSync(0);
+}
+
+app.listen(4747);
 
 function exit() {
-  //stopButton.writeSync(0);
-  //stopButton.unexport();
+  stopButton.writeSync(0);
+  stopButton.unexport();
+
+  upButton.writeSync(0);
+  upButton.unexport();
+
+  //downButton.writeSync(0);
+  //downButton.unexport();
+
+  selectButton.writeSync(0);
+  selectButton.unexport();
+
   process.exit();
 }
 
