@@ -1,6 +1,12 @@
 SomfyProxy
 
-Some information about the wiring and connections to the raspberry pinout
+This is a project for controlling your Somfy blinds with a Tellstick .NET.
+
+You are going to need:
+- Raspberry Pi with node.js
+- Arduino with a 433Mhz reciever module
+
+There is a more detailed information about the circuitry in the fritzing file. Additional information can be found on www.hibbisoft.com.
 
 Cable to Somfy remote
 
