@@ -1,5 +1,7 @@
 var express = require('express');
 var app = express();
+var serialport = require("serialport");
+var SerialPort = serialport.SerialPort;
 
 var sleep = require('sleep');
 
@@ -9,12 +11,20 @@ var Gpio = require('onoff').Gpio,
   stopButton = new Gpio(14, 'out'),
   selectButton = new Gpio(23, 'out')
 
-  //stopButton.writeSync(0);
-  //upButton.writeSync(0);
-  //downButton.writeSync(0);
-  //selectButton.writeSync(0);
-
 var standardButtonPress = 60000; //microseconds
+
+var serialPort = new SerialPort("/dev/ttyUSB0", {
+	baudrate: 9600,
+	parser: serialport.parsers.readline("\n")
+});
+
+serialPort.on("open", function () {
+	console.log('serial port open');
+	serialPort.on('data', function (data) {
+		console.log(data);
+		//TODO parse the data and call the correct commands
+	});
+});
 
 app.get('/', function(req, res) {
   	res.type('text/plain');
@@ -25,29 +35,22 @@ app.post('/up', function(req, res) {
 	res.type('text/plain');
   	res.send('going up');
 
-	upButton.writeSync(1);
-	sleep.usleep(standardButtonPress);
-	upButton.writeSync(0);
-                  
+	up();
 });
 
 app.post('/down', function(req, res) {
   	res.type('text/plain');
   	res.send('going down');
 
-	downButton.writeSync(1);
-	sleep.usleep(standardButtonPress);
-	downButton.writeSync(0);
-   
+	down();
+
 });
 
 app.post('/stop', function(req, res) {
   	res.type('text/plain');
   	res.send('stopping');
 
-	stopButton.writeSync(1);
-	sleep.usleep(standardButtonPress);
-	stopButton.writeSync(0);
+	stop();
 
 });
 
@@ -57,6 +60,24 @@ app.post('/select', function(req, res) {
 
 	selectChannel();
 });
+
+function up() {
+	upButton.writeSync(1);
+	sleep.usleep(standardButtonPress);
+	upButton.writeSync(0);
+}
+
+function stop() {
+	stopButton.writeSync(1);
+	sleep.usleep(standardButtonPress);
+	stopButton.writeSync(0);
+}
+
+function down() {
+	downButton.writeSync(1);
+	sleep.usleep(standardButtonPress);
+	downButton.writeSync(0);
+}
 
 function selectChannel()
 {
