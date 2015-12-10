@@ -22,7 +22,24 @@ serialPort.on("open", function () {
 	console.log('serial port open');
 	serialPort.on('data', function (data) {
 		console.log(data);
-		//TODO parse the data and call the correct commands
+		var parameters = data.split(';')
+
+		//these values are based on what i get from my Tellstick
+		if(parameters[1] == '192')
+		{
+			up();
+		}
+
+		if(parameters[1] == '3')
+		{
+			down();
+		}
+
+		if(parameters[1] == '48')
+		{
+			stop();
+		}
+
 	});
 });
 
