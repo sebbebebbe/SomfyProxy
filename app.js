@@ -11,6 +11,11 @@ var Gpio = require('onoff').Gpio,
   stopButton = new Gpio(14, 'out'),
   selectButton = new Gpio(23, 'out')
 
+stopButton.writeSync(0);
+upButton.writeSync(0);
+downButton.writeSync(0);
+selectButton.writeSync(0);
+
 var standardButtonPress = 60000; //microseconds
 
 var serialPort = new SerialPort("/dev/ttyUSB1", {
