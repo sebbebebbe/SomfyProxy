@@ -13,7 +13,7 @@ var Gpio = require('onoff').Gpio,
 
 var standardButtonPress = 60000; //microseconds
 
-var serialPort = new SerialPort("/dev/ttyUSB0", {
+var serialPort = new SerialPort("/dev/ttyUSB1", {
 	baudrate: 9600,
 	parser: serialport.parsers.readline("\n")
 });
